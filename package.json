@@ -1,0 +1,19 @@
+{
+  "name": "com.ugs.unittask",
+  "version": "0.1.0",
+  "displayName": "UGS.UnitTask",
+  "description": "A unit task chain and scheduler framework for strategy games.",
+  "unity": "2021.3",
+  "keywords": [
+    "unit",
+    "task",
+    "chain",
+    "scheduler",
+    "ai"
+  ],
+  "author": {
+    "name": "Noah",
+    "email": "noah-zhou@qq.com",
+    "url": "https://github.com/noah-zll?tab=repositories"
+  }
+}
