@@ -5,6 +5,8 @@ namespace UGS.UnitTask
 {
     public sealed class UnitTaskScheduler : IUnitTaskScheduler, IUnitTaskDebugSnapshotSource, IDisposable
     {
+        public int Id { get; }
+        public string Name { get; }
         public int ChainCount => _chains.Count;
         public UnitTaskSchedulerConfig Config { get; }
 
@@ -14,8 +16,10 @@ namespace UGS.UnitTask
         private float _lastTime;
         private bool _disposed;
 
-        public UnitTaskScheduler(UnitTaskSchedulerConfig? config = null)
+        public UnitTaskScheduler(int id, string name, UnitTaskSchedulerConfig? config = null)
         {
+            Id = id;
+            Name = name;
             Config = config ?? UnitTaskSchedulerConfig.Default;
             _chains = new List<IUnitTaskChain>(16);
             _traceBuffer = Config.EnableDebugTrace ? new UnitTaskDebugTraceBuffer(Config.DebugTraceCapacity) : null;
@@ -162,7 +166,7 @@ namespace UGS.UnitTask
             }
 
             var decisions = _traceBuffer != null ? _traceBuffer.ToArray() : Array.Empty<UnitTaskDecisionRecord>();
-            return new UnitTaskSchedulerSnapshot(_lastTime, chains, decisions);
+            return new UnitTaskSchedulerSnapshot(Id, Name, _lastTime, chains, decisions);
         }
 
         private sealed class UnitTaskContextProxy : IUnitTaskContext, IUnitTaskDebugTraceSink

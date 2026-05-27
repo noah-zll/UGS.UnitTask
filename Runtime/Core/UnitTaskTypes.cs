@@ -207,6 +207,7 @@ namespace UGS.UnitTask
 
         event Action<IUnitTaskChain> Started;
         event Action<IUnitTaskChain, UnitTaskChainStatus> Ended;
+        event Action<IUnitTaskChain> Reseted;
 
         void Enqueue(IUnitTask task);
         void Enqueue(IUnitTask task, string label);

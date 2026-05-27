@@ -64,15 +64,21 @@ namespace UGS.UnitTask
 
     public sealed class UnitTaskSchedulerSnapshot
     {
+        public int Id { get; }
+        public string Name { get; }
         public float Time { get; }
         public IReadOnlyList<UnitTaskChainSnapshot> Chains { get; }
         public IReadOnlyList<UnitTaskDecisionRecord> RecentDecisions { get; }
 
         public UnitTaskSchedulerSnapshot(
+            int id,
+            string name,
             float time,
             IReadOnlyList<UnitTaskChainSnapshot> chains,
             IReadOnlyList<UnitTaskDecisionRecord> recentDecisions)
         {
+            Id = id;
+            Name = name;
             Time = time;
             Chains = chains ?? Array.Empty<UnitTaskChainSnapshot>();
             RecentDecisions = recentDecisions ?? Array.Empty<UnitTaskDecisionRecord>();

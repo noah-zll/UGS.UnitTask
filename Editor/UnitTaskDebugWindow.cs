@@ -223,8 +223,8 @@ namespace UGS.UnitTask.Editor
                 return "Null";
             }
 
-            var type = source.GetType();
-            return $"{type.Name}@{source.GetHashCode()}";
+            var snapshot = source.Capture();
+            return $"{snapshot.Name}@{snapshot.Id}";
         }
 
         private static UnitTaskSchedulerSnapshot SafeCapture(IUnitTaskDebugSnapshotSource source)

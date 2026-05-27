@@ -34,6 +34,7 @@ namespace UGS.UnitTask
 
         public event Action<IUnitTaskChain> Started;
         public event Action<IUnitTaskChain, UnitTaskChainStatus> Ended;
+        public event Action<IUnitTaskChain> Reseted;
 
         public IUnitTask Current
         {
@@ -627,6 +628,8 @@ namespace UGS.UnitTask
             _hasStarted = false;
             _hasEnded = false;
             _entryResolved = false;
+
+            Reseted?.Invoke(this);
         }
 
         private void RestartFromBeginning(IUnitTaskContext context)
