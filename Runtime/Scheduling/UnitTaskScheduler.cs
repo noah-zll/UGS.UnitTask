@@ -169,7 +169,7 @@ namespace UGS.UnitTask
             return new UnitTaskSchedulerSnapshot(Id, Name, _lastTime, chains, decisions);
         }
 
-        private sealed class UnitTaskContextProxy : IUnitTaskContext, IUnitTaskDebugTraceSink
+        private sealed class UnitTaskContextProxy : IUnitTaskContext, IUnitTaskDebugTraceSink, IUnitTaskContextServices
         {
             private IUnitTaskContext _inner;
             private readonly UnitTaskDebugTraceBuffer _buffer;
@@ -189,6 +189,12 @@ namespace UGS.UnitTask
             public bool IsUnitEligible(int unitId, IUnitTask task) => _inner.IsUnitEligible(unitId, task);
             public IRandom Random => _inner.Random;
             public float Time => _inner.Time;
+
+            public bool TryGetService<T>(out T service) where T : class
+            {
+                service = _inner as T;
+                return service != null;
+            }
 
             public void Record(in UnitTaskDecisionRecord record)
             {

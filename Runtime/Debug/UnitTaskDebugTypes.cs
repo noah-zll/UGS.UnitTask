@@ -23,6 +23,7 @@ namespace UGS.UnitTask
         public readonly float Time;
         public readonly UnitTaskDecisionKind Kind;
         public readonly int ChainId;
+        public readonly string ChainName;
         public readonly int TaskIndex;
         public readonly int? BoundUnitId;
         public readonly UnitTaskStatus TaskStatus;
@@ -33,6 +34,7 @@ namespace UGS.UnitTask
             float time,
             UnitTaskDecisionKind kind,
             int chainId,
+            string chainName,
             int taskIndex,
             int? boundUnitId,
             UnitTaskStatus taskStatus,
@@ -42,6 +44,7 @@ namespace UGS.UnitTask
             Time = time;
             Kind = kind;
             ChainId = chainId;
+            ChainName = chainName;
             TaskIndex = taskIndex;
             BoundUnitId = boundUnitId;
             TaskStatus = taskStatus;

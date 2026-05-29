@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Reflection;
 
 namespace UGS.UnitTask
 {
@@ -56,6 +58,14 @@ namespace UGS.UnitTask
                 s_sources.CopyTo(result);
                 return result;
             }
+        }
+
+        public static string GetEnumDescription(this Enum value)
+        {
+            FieldInfo field = value.GetType().GetField(value.ToString());
+            return Attribute.GetCustomAttribute(field, typeof(DescriptionAttribute)) is not DescriptionAttribute attribute
+                ? value.ToString()
+                : attribute.Description;
         }
     }
 }

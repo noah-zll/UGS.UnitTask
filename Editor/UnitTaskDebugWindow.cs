@@ -1,6 +1,7 @@
 using System;
 using UnityEditor;
 using UnityEngine;
+using System.ComponentModel;
 
 namespace UGS.UnitTask.Editor
 {
@@ -212,7 +213,7 @@ namespace UGS.UnitTask.Editor
                 var d = decisions[i];
                 var taskType = d.TaskType != null ? d.TaskType.Name : "Unknown";
                 var unit = d.BoundUnitId.HasValue ? d.BoundUnitId.Value.ToString() : "-";
-                EditorGUILayout.LabelField($"{d.Time:0.000}  C{d.ChainId}  T{d.TaskIndex}  {d.Kind}  {taskType}  Unit:{unit}  {d.TaskStatus}  {d.Reason}");
+                EditorGUILayout.LabelField($"{d.Time:0.000}  C{d.ChainId} {d.ChainName}  T{d.TaskIndex}  {d.Kind}  {taskType}  Unit:{unit}  {d.TaskStatus.GetEnumDescription()}  {d.Reason.GetEnumDescription()}");
             }
         }
 

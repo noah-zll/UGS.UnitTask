@@ -153,7 +153,11 @@ namespace UGS.UnitTask
 
             if (_labelToIndex.TryGetValue(label, out var existing) && existing != taskIndex)
             {
-                throw new ArgumentException($"Duplicate task label '{label}'.", nameof(label));
+                // 重复给加一个随机数，确保唯一，并发出警告
+                string newLabel = $"{label}@{UnityEngine.Random.Range(0, int.MaxValue)}";
+                SetTaskLabel(taskIndex, newLabel);
+                UnityEngine.Debug.LogWarning($"Duplicate task label '{label}' to '{newLabel}'.");
+                return;
             }
 
             var previous = _taskLabels[taskIndex];
@@ -384,7 +388,11 @@ namespace UGS.UnitTask
             }
 
             var current = Current;
-            if (!canAdvance && (current == null || current.Status != UnitTaskStatus.Running))
+            if (!canAdvance &&
+                (current == null ||
+                 (current.Status != UnitTaskStatus.Running &&
+                  current.Status != UnitTaskStatus.Succeeded &&
+                  current.Status != UnitTaskStatus.Skipped)))
             {
                 return;
             }
@@ -397,6 +405,7 @@ namespace UGS.UnitTask
                 return;
             }
 
+            var advancedInThisTick = false;
             while (true)
             {
                 if (_currentIndex >= _tasks.Count)
@@ -420,18 +429,19 @@ namespace UGS.UnitTask
                 }
 
                 var task = _tasks[_currentIndex];
-                if (!canAdvance && task.Status != UnitTaskStatus.Running)
-                {
-                    return;
-                }
                 if (task.Status == UnitTaskStatus.Succeeded || task.Status == UnitTaskStatus.Skipped)
                 {
                     _currentIndex = ResolveNextIndex(context, _currentIndex, task);
+                    advancedInThisTick = true;
                     if (Status == UnitTaskChainStatus.Completed || Status == UnitTaskChainStatus.Cancelled)
                     {
                         return;
                     }
                     continue;
+                }
+                if (!canAdvance && task.Status != UnitTaskStatus.Running && !advancedInThisTick)
+                {
+                    return;
                 }
                 if (task.Status == UnitTaskStatus.Failed)
                 {
@@ -459,6 +469,7 @@ namespace UGS.UnitTask
                             time: context.Time,
                             kind: UnitTaskDecisionKind.ExecutorBound,
                             chainId: ChainId,
+                            chainName: Name,
                             taskIndex: _currentIndex,
                             boundUnitId: afterBoundUnitId,
                             taskStatus: afterStatus,
@@ -471,6 +482,7 @@ namespace UGS.UnitTask
                             time: context.Time,
                             kind: UnitTaskDecisionKind.ExecutorBindFailed,
                             chainId: ChainId,
+                            chainName: Name,
                             taskIndex: _currentIndex,
                             boundUnitId: afterBoundUnitId,
                             taskStatus: afterStatus,
@@ -487,6 +499,7 @@ namespace UGS.UnitTask
                             time: context.Time,
                             kind: task.Status == UnitTaskStatus.Succeeded ? UnitTaskDecisionKind.TaskSucceeded : UnitTaskDecisionKind.TaskSkipped,
                             chainId: ChainId,
+                            chainName: Name,
                             taskIndex: _currentIndex,
                             boundUnitId: afterBoundUnitId,
                             taskStatus: task.Status,
@@ -494,6 +507,7 @@ namespace UGS.UnitTask
                             taskType: task.GetType()));
                     }
                     _currentIndex = ResolveNextIndex(context, _currentIndex, task);
+                    advancedInThisTick = true;
                     if (Status == UnitTaskChainStatus.Completed || Status == UnitTaskChainStatus.Cancelled)
                     {
                         return;
@@ -509,6 +523,7 @@ namespace UGS.UnitTask
                             time: context.Time,
                             kind: UnitTaskDecisionKind.TaskFailed,
                             chainId: ChainId,
+                            chainName: Name,
                             taskIndex: _currentIndex,
                             boundUnitId: afterBoundUnitId,
                             taskStatus: task.Status,
@@ -537,6 +552,7 @@ namespace UGS.UnitTask
                                     time: context.Time,
                                     kind: UnitTaskDecisionKind.TaskRetryScheduled,
                                     chainId: ChainId,
+                                    chainName: Name,
                                     taskIndex: _currentIndex,
                                     boundUnitId: task.BoundUnitId,
                                     taskStatus: task.Status,
@@ -660,6 +676,7 @@ namespace UGS.UnitTask
                     time: context.Time,
                     kind: UnitTaskDecisionKind.ChainLoopRestarted,
                     chainId: ChainId,
+                    chainName: Name,
                     taskIndex: 0,
                     boundUnitId: null,
                     taskStatus: UnitTaskStatus.Pending,
@@ -775,6 +792,7 @@ namespace UGS.UnitTask
                     time: context.Time,
                     kind: UnitTaskDecisionKind.ChainStarted,
                     chainId: ChainId,
+                    chainName: Name,
                     taskIndex: _currentIndex,
                     boundUnitId: null,
                     taskStatus: UnitTaskStatus.Pending,
@@ -800,6 +818,7 @@ namespace UGS.UnitTask
                     time: context.Time,
                     kind: UnitTaskDecisionKind.ChainCompleted,
                     chainId: ChainId,
+                    chainName: Name,
                     taskIndex: taskIndex,
                     boundUnitId: null,
                     taskStatus: task != null ? task.Status : UnitTaskStatus.Succeeded,
@@ -827,6 +846,7 @@ namespace UGS.UnitTask
                     time: context.Time,
                     kind: UnitTaskDecisionKind.TaskCancelled,
                     chainId: ChainId,
+                    chainName: Name,
                     taskIndex: taskIndex,
                     boundUnitId: boundUnitId,
                     taskStatus: task.Status,
@@ -840,6 +860,7 @@ namespace UGS.UnitTask
                     time: context.Time,
                     kind: UnitTaskDecisionKind.ChainCancelled,
                     chainId: ChainId,
+                    chainName: Name,
                     taskIndex: taskIndex,
                     boundUnitId: null,
                     taskStatus: task != null ? task.Status : UnitTaskStatus.Cancelled,

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace UGS.UnitTask
 {
@@ -15,12 +16,19 @@ namespace UGS.UnitTask
 
     public enum UnitTaskStatus
     {
+        [Description("待处理")]
         Pending,
+        [Description("待执行")]
         Ready,
+        [Description("执行中")]
         Running,
+        [Description("已完成")]
         Succeeded,
+        [Description("已失败")]
         Failed,
+        [Description("已取消")]
         Cancelled,
+        [Description("已跳过")]
         Skipped
     }
 
@@ -48,14 +56,23 @@ namespace UGS.UnitTask
 
     public enum UnitTaskReasonCode
     {
+        [Description("无")]
         None,
+        [Description("无候选单位")]
         NoCandidates,
+        [Description("所有单位都不符合条件")]
         AllIneligible,
+        [Description("单位不存在")]
         UnitNotFound,
+        [Description("单位不符合条件")]
         UnitIneligible,
+        [Description("预算限制")]
         BudgetLimited,
+        [Description("选择错误")]
         SelectionError,
+        [Description("任务前置条件失败")]
         TaskPreconditionFailed,
+        [Description("任务执行失败")]
         TaskExecutionFailed
     }
 
@@ -108,6 +125,11 @@ namespace UGS.UnitTask
         bool IsUnitEligible(int unitId, IUnitTask task);
         IRandom Random { get; }
         float Time { get; }
+    }
+
+    public interface IUnitTaskContextServices
+    {
+        bool TryGetService<T>(out T service) where T : class;
     }
 
     public interface IUnitTask
