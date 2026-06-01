@@ -74,6 +74,7 @@ namespace UGS.UnitTask
         private bool _hasStarted;
         private bool _hasEnded;
         private bool _entryResolved;
+        private bool _ignoreRunConditionOnce;
 
         public UnitTaskChain(
             int chainId,
@@ -113,6 +114,7 @@ namespace UGS.UnitTask
             _hasStarted = false;
             _hasEnded = false;
             _entryResolved = false;
+            _ignoreRunConditionOnce = false;
         }
 
         public void Enqueue(IUnitTask task)
@@ -327,6 +329,11 @@ namespace UGS.UnitTask
             RunCondition = condition;
         }
 
+        public void RequestTickOnceIgnoringRunCondition()
+        {
+            _ignoreRunConditionOnce = true;
+        }
+
         public void Tick(IUnitTaskContext context, float deltaTime)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
@@ -341,7 +348,10 @@ namespace UGS.UnitTask
                 return;
             }
 
-            if (RunCondition != null && !RunCondition.Evaluate(context, this))
+            var ignoreRunCondition = _ignoreRunConditionOnce;
+            _ignoreRunConditionOnce = false;
+
+            if (!ignoreRunCondition && RunCondition != null && !RunCondition.Evaluate(context, this))
             {
                 return;
             }
@@ -644,6 +654,7 @@ namespace UGS.UnitTask
             _hasStarted = false;
             _hasEnded = false;
             _entryResolved = false;
+            _ignoreRunConditionOnce = false;
 
             Reseted?.Invoke(this);
         }
@@ -668,6 +679,7 @@ namespace UGS.UnitTask
             _isWaitingForRetryDelay = false;
             _retryUntilTime = 0f;
             _entryResolved = false;
+            _ignoreRunConditionOnce = false;
             _lastTickTime = 0f;
 
             if (trace != null)
