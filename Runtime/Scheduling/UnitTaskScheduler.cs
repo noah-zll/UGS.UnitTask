@@ -8,6 +8,7 @@ namespace UGS.UnitTask
         public int Id { get; }
         public string Name { get; }
         public int ChainCount => _chains.Count;
+        public List<IUnitTaskChain> Chains => _chains;
         public UnitTaskSchedulerConfig Config { get; }
 
         private readonly List<IUnitTaskChain> _chains;
